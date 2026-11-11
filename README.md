@@ -1,6 +1,6 @@
-# KORA — studio créatif & atelier d’impression
+# A360 — studio créatif & atelier d’impression
 
-Site vitrine en français pour une agence de communication et une imprimerie à Abidjan. **KORA est un nom de démonstration** : le nom, les coordonnées et les visuels sont à remplacer par ceux de l’agence. Les projets du portfolio sont des concepts illustratifs, et non des références clients réelles.
+Site vitrine en français pour une agence de communication et une imprimerie à Abidjan. **A360 est un nom de démonstration** : le nom, les coordonnées et les visuels sont à remplacer par ceux de l’agence. Les projets du portfolio sont des concepts illustratifs, et non des références clients réelles.
 
 ## Démarrer
 
