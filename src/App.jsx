@@ -73,8 +73,9 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [quoteType, setQuoteType] = useState(null);
   const [quoteOpen, setQuoteOpen] = useState(false);
-  const [batOpen, setBatOpen] = useState(false);
-  const [batToken, setBatToken] = useState('');
+  const [initialBatToken] = useState(() => typeof window === 'undefined' ? '' : new URL(window.location.href).searchParams.get('bat') || '');
+  const [batOpen, setBatOpen] = useState(Boolean(initialBatToken));
+  const [batToken, setBatToken] = useState(initialBatToken);
   const [activeCapability, setActiveCapability] = useState(null);
   const [filter, setFilter] = useState('Tous les projets');
   const [project, setProject] = useState(null);
@@ -82,9 +83,7 @@ function App() {
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    const token = url.searchParams.get('bat');
-    if (token) {
-      setBatToken(token); setBatOpen(true);
+    if (url.searchParams.has('bat')) {
       url.searchParams.delete('bat');
       window.history.replaceState({}, '', url.pathname + url.search + url.hash);
     }

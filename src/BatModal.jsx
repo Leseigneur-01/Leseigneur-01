@@ -2,29 +2,48 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight, ArrowUpRight, Check, FileCheck2, LoaderCircle, LockKeyhole, X } from 'lucide-react';
 import { Modal, Star } from './App.jsx';
 
+async function requestBat(value, signal) {
+  let candidate = value.trim();
+  try { if (candidate.startsWith('http')) candidate = new URL(candidate).searchParams.get('bat') || ''; } catch { candidate = ''; }
+  if (!/^[A-Za-z0-9_-]{43}$/.test(candidate)) throw new Error('Saisissez le code ou le lien personnel transmis par l’agence.');
+  const response = await fetch(`/api/bat/${encodeURIComponent(candidate)}`, { signal });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Impossible de retrouver votre BAT.');
+  return { candidate, data };
+}
+
 export default function BatModal({ initialToken, onClose }) {
   const [input, setInput] = useState(initialToken || '');
   const [token, setToken] = useState('');
   const [bat, setBat] = useState(null);
   const [confirm, setConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(Boolean(initialToken));
   const [error, setError] = useState('');
   const [productionConfigured, setProductionConfigured] = useState(null);
   const load = async value => {
-    setError('');
-    let candidate = value.trim();
-    try { if (candidate.startsWith('http')) candidate = new URL(candidate).searchParams.get('bat') || ''; } catch { candidate = ''; }
-    if (!/^[A-Za-z0-9_-]{43}$/.test(candidate)) { setError('Saisissez le code ou le lien personnel transmis par l’agence.'); return; }
-    setLoading(true);
+    setError(''); setLoading(true);
     try {
-      const response = await fetch(`/api/bat/${encodeURIComponent(candidate)}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Impossible de retrouver votre BAT.');
+      const { candidate, data } = await requestBat(value);
       setToken(candidate); setBat(data); setProductionConfigured(data.productionConfigured);
     } catch (err) { setError(err.message || 'Impossible de retrouver votre BAT.'); }
     finally { setLoading(false); }
   };
-  useEffect(() => { if (initialToken) void load(initialToken); }, [initialToken]);
+  useEffect(() => {
+    if (!initialToken) return;
+    const controller = new AbortController();
+    const openInitialBat = async () => {
+      try {
+        const { candidate, data } = await requestBat(initialToken, controller.signal);
+        if (!controller.signal.aborted) { setToken(candidate); setBat(data); setProductionConfigured(data.productionConfigured); }
+      } catch (err) {
+        if (!controller.signal.aborted) setError(err.message || 'Impossible de retrouver votre BAT.');
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    };
+    void openInitialBat();
+    return () => controller.abort();
+  }, [initialToken]);
   const approve = async () => {
     if (!confirm) { setError('Confirmez avoir vérifié votre épreuve avant validation.'); return; }
     setError(''); setLoading(true);

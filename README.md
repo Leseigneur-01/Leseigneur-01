@@ -11,7 +11,9 @@ npm install
 npm run dev
 ```
 
-Le site et son API sont accessibles sur le port `5173` (ou celui défini par `PORT`). Pour vérifier le build et les tests :
+Le site et son API sont accessibles sur le port `5173` (ou celui défini par `PORT`). L’application utilise Vite et Express ; les fichiers de configuration et les commandes `next:*` conservés depuis le gabarit de `main` ne pilotent pas ce site et nécessitent une application Next distincte.
+
+Pour vérifier le build et les tests :
 
 ```bash
 npm run build

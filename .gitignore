@@ -6,3 +6,5 @@ var/
 !.env.example
 *.log
 .DS_Store
+.next/
+*.tsbuildinfo
